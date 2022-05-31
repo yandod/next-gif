@@ -74,7 +74,7 @@ export default function Home({data}) {
             <a href={"https://gfycat.com/" + row.gfyId} className="card">
             <h3>{row.title}</h3>
             <p>👀{row.views} 💕{row.likes} </p>
-            <img src={row.gifUrl} />
+            <img src={row.max1mbGif} />
           </a>
           ))}
         </div>
