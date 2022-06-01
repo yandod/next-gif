@@ -1,6 +1,6 @@
 const Gfycat = require('gfycat-sdk')
 
-async function trending(cursor, tag) {
+async function trendingTags(cursor) {
     var gfycat = new Gfycat({
         clientId: process.env['GFYCAT_CLIENT_ID'],
         clientSecret: process.env['GFYCAT_SECRET']
@@ -8,22 +8,19 @@ async function trending(cursor, tag) {
     gfycat.authenticate()
 
     let options = {
-        gfyCount: 6,
+        tagCount: 10,
+        populated: true,
       }
     if (cursor) {
         options['cursor'] = cursor;
     }
-
-    if (tag) {
-        options['tagName'] = tag
-    }
-    let result = await gfycat.getTrendingCategories(options)
-
+    let result = await gfycat.trendingTags(options)
+    console.dir(result)
     const data = {
-        cursor: result.cursor,
-        gfycats: result.gfycats
+        tags: result['tags'].slice(1, 10) //chop '_gfycat_all_trending'
     }
+    console.dir(data);
     return data;
 }
 
-export default trending;
+export default trendingTags;

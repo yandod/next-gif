@@ -2,22 +2,22 @@ import Head from 'next/head'
 import Link from 'next/link'
 
 import trending from '../lib/trending'
-import trendingTags from '../lib/tags'
+
 export async function getServerSideProps(context) {
   let cursor = ''
+  let tag = context.query.q
   if (context.query.cursor) {
     cursor = context.query.cursor
   }
-  const data = await trending(cursor);
-  const tags = await trendingTags();
-
+  const data = await trending(cursor, tag);
   return {
-    props: {data: data, tags: tags} // will be passed to the page component as props
+    props: {data: data, tag: tag}, // will be passed to the page component as props
   }
 }
 
-export default function Home({data, tags}) {
+export default function Home({data, tag}) {
 
+  console.dir(data);
   return (
     <div className="container">
       <Head>
@@ -34,51 +34,11 @@ export default function Home({data, tags}) {
         </h1>
 
         <p className="description">
-          <form action="/search" method="GET">
-            <input type="text" name="q" />
-            {' '}
-            <input type="submit" value="Search" />
-          </form>
+          Trending for {tag}
         </p>
-
-        <h2>Quick Search</h2>
-
-        <p className="quick">
-          <Link href='/search?q=Monday'>
-            <a>Monday</a>
-          </Link>{' '}
-          <Link href='/search?q=Tuesday'>
-            <a>Tuesday</a>
-          </Link>{' '}
-          <Link href='/search?q=Wednesday'>
-            <a>Wednesday</a>
-          </Link>{' '}
-          <Link href='/search?q=Thursday'>
-            <a>Thursday</a>
-          </Link>{' '}
-          <Link href='/search?q=Friday'>
-            <a>Friday</a>
-          </Link>{' '}
-          <Link href='/search?q=Saturday'>
-            <a>Saturday</a>
-          </Link>{' '}
-          <Link href='/search?q=Sunday'>
-            <a>Sunday</a>
-          </Link>
-        </p>
-
-        <h2>Trending Tags</h2>
-        <p className="quick">
-          {tags['tags'].map(row => (
-            <Link href={"/bytags?q=" + row.tag}>
-            <a>{row.tag + ' '}</a>
-            </Link>
-          ))}
-        </p>
-
-        <h2>Trending GIFs</h2>
 
         <div className="grid">
+          {console.log(data['gfycats'])}
           {data['gfycats'].map( row => (
             <a href={"https://gfycat.com/" + row.gfyId} className="card">
             <h3>{row.title}</h3>
@@ -89,7 +49,7 @@ export default function Home({data, tags}) {
         </div>
 
         <p className="description">
-          <Link href={'/?cursor=' + data['cursor']}>
+          <Link href={'/bytags?cursor=' + data['cursor'] + "&q=" + tag}>
           <a>Explore more</a>
           </Link>
         </p>
@@ -156,14 +116,8 @@ export default function Home({data, tags}) {
 
         .title a:hover,
         .title a:focus,
-        .title a:active,
-        .quick a:hover {
+        .title a:active {
           text-decoration: underline;
-        }
-
-        .quick {
-          max-width: 600px;
-          line-height: 1.5;
         }
 
         .title {
@@ -180,7 +134,6 @@ export default function Home({data, tags}) {
         .description {
           line-height: 1.5;
           font-size: 1.5rem;
-          max-width: 600px;
         }
 
         code {
